@@ -16,8 +16,8 @@ describe("Buffer", function(){
 			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.OVERWRITE);
 		});	
 
-		it("has a default type of Object", function(){
-			expect(buffer.DATA_TYPE).to.be(Object);
+		it("has a default type of null with no type checking", function(){
+			expect(buffer.DATA_TYPE).to.be(null);
 		});
 
 		it("allows an initial capacity to be set", function() {
@@ -46,6 +46,7 @@ describe("Buffer", function(){
 		});
 
 		it("throws an exception if the structure is not empty", function() {
+			buffer.setDataType(null);
 			buffer.add(9);
 			expect((function(){
 				buffer.setDataType(Number);
@@ -108,6 +109,7 @@ describe("Buffer", function(){
 
 		it("allows only elements of the defined DATA_TYPE", function(){
 			expect((function(){
+				buffer.clear();
 				buffer.setDataType(Number);
 				buffer.add("not a number");
 			})).to.throwException(function(e){
