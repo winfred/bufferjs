@@ -31,8 +31,8 @@ describe("Buffer", function(){
 		});
 
 		it("allows an initial grow mode to be set", function() {
-			buffer = new Buffer({GROW_MODE: Buffer.GROW_MODE.REGROW});
-			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.REGROW);
+			buffer = new Buffer({GROW_MODE: Buffer.GROW_MODE.CONTINUOUS});
+			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.CONTINUOUS);
 		});
 	});
 
@@ -154,4 +154,48 @@ describe("Buffer", function(){
 		});
 
 	});
+
+	describe("GROW_MODE::CONTINUOUS", function(){
+		var buffer = new Buffer({capacity: 5, GROW_MODE: Buffer.GROW_MODE.CONTINUOUS});
+
+		it("capacity doubles once capacity is reached", function(){
+			for(var i = 0; i < 100; i++)
+				buffer.write(i);
+			expect(buffer.capacity).to.be(160); //5, 10, 20, 40, 80, 160
+		});
+
+		it("length grows steadily based on writes", function(){
+			buffer.clear();
+			for(var i = 0; i < 100; i++)
+				buffer.write(i);
+			expect(buffer.length).to.be(100);
+		});
+
+		it("length lessens steadily based on reads", function(){
+			for(var i = 0; i < 50; i++)
+				buffer.read();
+			expect(buffer.length).to.be(50);
+			for(var i = 0; i < 50; i++)
+				buffer.write(i);
+			expect(buffer.length).to.be(100);
+		});
+
+		it("capacity remains the same until it is reached (a la circular array)", function(){
+			expect(buffer.capacity).to.be(160);
+		});
+
+		it("when capacity doubles, circular array structure is still transparent", function(){
+			buffer.clear();
+			for(var i = 0; i< 160; i++)
+				buffer.write(i);
+			expect(buffer.capacity).to.be(160);
+			expect(buffer.read()).to.be(0);
+			for(var i = 0; i< 10; i++)
+				buffer.read();
+			for(var i = 0; i< 11; i++)
+				buffer.write("hey");
+			expect(buffer.read()).to.be(11);
+		});
+	});
+
 });
