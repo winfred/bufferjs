@@ -197,5 +197,34 @@ describe("Buffer", function(){
 			expect(buffer.read()).to.be(11);
 		});
 	});
+	
+	describe("GROW_MODE::OVERWRITE", function(){
+		var buffer = new Buffer({capacity: 25});
+
+		it("capacity remains constant regardless of writes", function(){
+			for(var i = 0; i < 30; i++)
+				buffer.write(i);
+			expect(buffer.capacity).to.be(25);
+		});
+
+		it("length has a maximum possible value equal to capacity", function() {
+			buffer.read();
+			buffer.read();
+			for(var i = 0; i < 100; i++)
+				buffer.write(i);
+			expect(buffer.length).to.be(25);
+		});
+
+		it("begins overwriting the oldest elements once capacity is reached", function(){
+			buffer.clear();
+			buffer.write("first/oldest element");
+			for(var i = 0; i < 24; i++)
+				buffer.write(i);
+			expect(buffer.length).to.be(25);
+			buffer.write("out with the old, in with the new");
+			expect(buffer.contains("first/oldest element")).to.be(false);			
+			expect(buffer.read()).to.not.be("first/oldest element");
+		});
+	});
 
 });
