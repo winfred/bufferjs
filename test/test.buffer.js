@@ -1,5 +1,15 @@
 describe("Buffer", function(){
 
+	function writeTo(buffer, times){
+		for(var i = 0; i < times; i++)
+			buffer.write(i);
+	};
+
+	function readFrom(buffer, times){
+		for(var i = 0; i < times; i++)
+			buffer.read();
+	};
+
 	describe("#new",function(){
 
 		var buffer = new Buffer();		
@@ -159,24 +169,20 @@ describe("Buffer", function(){
 		var buffer = new Buffer({capacity: 5, GROW_MODE: Buffer.GROW_MODE.CONTINUOUS});
 
 		it("capacity doubles once capacity is reached", function(){
-			for(var i = 0; i < 100; i++)
-				buffer.write(i);
+			writeTo(buffer,100);
 			expect(buffer.capacity).to.be(160); //5, 10, 20, 40, 80, 160
 		});
 
 		it("length grows steadily based on writes", function(){
 			buffer.clear();
-			for(var i = 0; i < 100; i++)
-				buffer.write(i);
+			writeTo(buffer,100);
 			expect(buffer.length).to.be(100);
 		});
 
 		it("length lessens steadily based on reads", function(){
-			for(var i = 0; i < 50; i++)
-				buffer.read();
+			readFrom(buffer, 50);
 			expect(buffer.length).to.be(50);
-			for(var i = 0; i < 50; i++)
-				buffer.write(i);
+			writeTo(buffer,50);
 			expect(buffer.length).to.be(100);
 		});
 
@@ -186,15 +192,12 @@ describe("Buffer", function(){
 
 		it("when capacity doubles, circular array structure is still transparent", function(){
 			buffer.clear();
-			for(var i = 0; i< 160; i++)
-				buffer.write(i);
+			writeTo(buffer, 160);
 			expect(buffer.capacity).to.be(160);
 			expect(buffer.read()).to.be(0);
-			for(var i = 0; i< 10; i++)
-				buffer.read();
-			for(var i = 0; i< 11; i++)
-				buffer.write("hey");
-			expect(buffer.read()).to.be(11);
+			readFrom(buffer,10); //remove first 10
+			writeTo(buffer, 11); //add eleven more to cause capacity to double
+			expect(buffer.read()).to.be(11); //the oldest element is still 11
 		});
 	});
 	
@@ -202,24 +205,21 @@ describe("Buffer", function(){
 		var buffer = new Buffer({capacity: 25});
 
 		it("capacity remains constant regardless of writes", function(){
-			for(var i = 0; i < 30; i++)
-				buffer.write(i);
+			writeTo(buffer, 30);	
 			expect(buffer.capacity).to.be(25);
 		});
 
 		it("length has a maximum possible value equal to capacity", function() {
 			buffer.read();
 			buffer.read();
-			for(var i = 0; i < 100; i++)
-				buffer.write(i);
+			writeTo(buffer, 100);
 			expect(buffer.length).to.be(25);
 		});
 
 		it("begins overwriting the oldest elements once capacity is reached", function(){
 			buffer.clear();
 			buffer.write("first/oldest element");
-			for(var i = 0; i < 24; i++)
-				buffer.write(i);
+			writeTo(buffer, 24);
 			expect(buffer.length).to.be(25);
 			buffer.write("out with the old, in with the new");
 			expect(buffer.contains("first/oldest element")).to.be(false);			
