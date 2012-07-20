@@ -79,9 +79,15 @@ describe("Buffer", function(){
 	describe("#length attribute", function(){
 		var buffer = new Buffer();		
 
-		it("returns the nuber of elements in the buffer", function(){
+		it("returns the number of elements in the buffer", function(){
 			buffer.write("element");
 			expect(buffer.length).to.eql(1);
+		});
+
+		it("can be overwritten publicly, but integrity is kept privately", function(){
+			buffer.length = 10000;
+			buffer.write("another element");
+			expect(buffer.length).to.eql(2);
 		});
 	});
 
