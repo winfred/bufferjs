@@ -75,12 +75,25 @@ describe("Buffer", function(){
 		});
 	});
 
-	describe("#length attributes", function(){
+	describe("#length attribute", function(){
 		var buffer = new Buffer();		
 
 		it("returns the nuber of elements in the buffer", function(){
 			buffer.add("element");
 			expect(buffer.length).to.eql(1);
+		});
+	});
+
+	describe("#contains", function(){
+		var buffer = new Buffer();
+
+		it("returns true if the buffer contains a certain element",function(){
+			buffer.add("a");
+			expect(buffer.contains("a")).to.eql(true);
+		});
+
+		it("returns false if the buffer does not contain an element", function(){
+			expect(buffer.contains(12345)).to.eql(false);
 		});
 	});
 
@@ -98,21 +111,31 @@ describe("Buffer", function(){
 				buffer.setDataType(Number);
 				buffer.add("not a number");
 			})).to.throwException(function(e){
-				expect(e).to.be.a(Buffer.InvalidTypeChangeException);
+				expect(e).to.be.a(Buffer.InvalidTypeAddException);
 			});
 		});
 	});
-
-	describe("#contains", function(){
+	
+	describe("#remove", function(){
 		var buffer = new Buffer();
+		buffer.add("a");
+		buffer.add("b");
+		buffer.add("c");
 
-		it("returns true if the buffer contains a certain element",function(){
-			buffer.add("a");
-			expect(buffer.contains("a")).to.eql(true);
+		it("decreases the length by one", function(){
+			var length = buffer.length;
+			buffer.remove();
+			expect(buffer.length).to.eql(length - 1);
+		});
+		
+		it("returns the oldest element in the buffer", function(){
+			expect(buffer.remove()).to.eql("b");
 		});
 
-		it("returns false if the buffer does not contain an element", function(){
-			expect(buffer.contains(12345)).to.eql(false);
+		it("returns null for an empty buffer",function(){
+			buffer.clear();
+			expect(buffer.remove()).to.eql(null);
 		});
+
 	});
 });
