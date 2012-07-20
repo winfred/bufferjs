@@ -123,7 +123,16 @@ describe("Buffer", function(){
 			expect(buffer.length).to.eql(1);
 		});
 
-		it("allows only elements of the defined DATA_TYPE", function(){
+		it("allows elements of the defined DATA_TYPE", function(){
+			buffer.clear();
+			buffer.setDataType(String);
+			expect(function(){
+				buffer.write("this is a string");
+			}).to.not.throwException();
+			expect(buffer.length).to.be(1);
+		});
+
+		it("does not allow elements not of the defined DATA_TYPE", function(){
 			expect((function(){
 				buffer.clear();
 				buffer.setDataType(Number);
