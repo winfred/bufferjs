@@ -145,5 +145,13 @@ describe("Buffer", function(){
 			expect(buffer.read()).to.eql(null);
 		});
 
+		it("removes the oldest element from the buffer", function(){
+			buffer.clear();
+			buffer.write("test");
+			buffer.read();
+			expect(buffer).to.be.empty();
+			expect(buffer.contains("test")).to.be(false);
+		});
+
 	});
 });
