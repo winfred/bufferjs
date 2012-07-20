@@ -47,7 +47,7 @@ describe("Buffer", function(){
 
 		it("throws an exception if the structure is not empty", function() {
 			buffer.setDataType(null);
-			buffer.add(9);
+			buffer.write(9);
 			expect((function(){
 				buffer.setDataType(Number);
 			})).to.throwException(/It is not safe to change a buffer's type/);
@@ -71,7 +71,7 @@ describe("Buffer", function(){
 		});
 
 		it("returns false if the buffer contains elements", function(){
-			buffer.add("element");
+			buffer.write("element");
 			expect(buffer.isEmpty()).to.eql(false);
 		});
 	});
@@ -80,7 +80,7 @@ describe("Buffer", function(){
 		var buffer = new Buffer();		
 
 		it("returns the nuber of elements in the buffer", function(){
-			buffer.add("element");
+			buffer.write("element");
 			expect(buffer.length).to.eql(1);
 		});
 	});
@@ -89,7 +89,7 @@ describe("Buffer", function(){
 		var buffer = new Buffer();
 
 		it("returns true if the buffer contains a certain element",function(){
-			buffer.add("a");
+			buffer.write("a");
 			expect(buffer.contains("a")).to.eql(true);
 		});
 
@@ -98,12 +98,12 @@ describe("Buffer", function(){
 		});
 	});
 
-	describe("#add", function() {
+	describe("#write", function() {
 		var buffer = new Buffer();		
 		
 		it("increases the length of the buffer by one", function(){
 			expect(buffer).to.be.empty();
-			buffer.add("element");
+			buffer.write("element");
 			expect(buffer.length).to.eql(1);
 		});
 
@@ -111,18 +111,18 @@ describe("Buffer", function(){
 			expect((function(){
 				buffer.clear();
 				buffer.setDataType(Number);
-				buffer.add("not a number");
+				buffer.write("not a number");
 			})).to.throwException(function(e){
-				expect(e).to.be.a(Buffer.InvalidTypeAddException);
+				expect(e).to.be.a(Buffer.InvalidTypeWriteException);
 			});
 		});
 	});
 	
 	describe("#remove", function(){
 		var buffer = new Buffer();
-		buffer.add("a");
-		buffer.add("b");
-		buffer.add("c");
+		buffer.write("a");
+		buffer.write("b");
+		buffer.write("c");
 
 		it("decreases the length by one", function(){
 			var length = buffer.length;
