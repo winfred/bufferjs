@@ -118,7 +118,7 @@ describe("Buffer", function(){
 		});
 	});
 	
-	describe("#remove", function(){
+	describe("#read", function(){
 		var buffer = new Buffer();
 		buffer.write("a");
 		buffer.write("b");
@@ -126,17 +126,17 @@ describe("Buffer", function(){
 
 		it("decreases the length by one", function(){
 			var length = buffer.length;
-			buffer.remove();
+			buffer.read();
 			expect(buffer.length).to.eql(length - 1);
 		});
 		
 		it("returns the oldest element in the buffer", function(){
-			expect(buffer.remove()).to.eql("b");
+			expect(buffer.read()).to.eql("b");
 		});
 
 		it("returns null for an empty buffer",function(){
 			buffer.clear();
-			expect(buffer.remove()).to.eql(null);
+			expect(buffer.read()).to.eql(null);
 		});
 
 	});
