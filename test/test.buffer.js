@@ -195,7 +195,7 @@ describe("Buffer", function(){
 			expect(buffer.length).to.be(100);
 		});
 
-		it("capacity remains the same until it is reached (a la circular array)", function(){
+		it("capacity doubles only when space is needed (a la circular array)", function(){
 			expect(buffer.capacity).to.be(160);
 		});
 
