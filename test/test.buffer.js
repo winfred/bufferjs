@@ -102,4 +102,17 @@ describe("Buffer", function(){
 			});
 		});
 	});
+
+	describe("#contains", function(){
+		var buffer = new Buffer();
+
+		it("returns true if the buffer contains a certain element",function(){
+			buffer.add("a");
+			expect(buffer.contains("a")).to.eql(true);
+		});
+
+		it("returns false if the buffer does not contain an element", function(){
+			expect(buffer.contains(12345)).to.eql(false);
+		});
+	});
 });
