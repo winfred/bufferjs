@@ -1,11 +1,8 @@
 describe("Buffer", function(){
-	var buffer = new Buffer();
 
 	describe("#new",function(){
 
-		beforeEach(function(){
-			var buffer = new Buffer();
-		});
+		var buffer = new Buffer();		
 
 		it("is empty at first",function(){
 			expect(buffer).to.be.empty();
@@ -15,8 +12,8 @@ describe("Buffer", function(){
 			expect(buffer.capacity).to.be(20);
 		});
 
-		it("has a default grow mode of REGROW", function(){
-			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.REGROW);
+		it("has a default grow mode of OVERWRITE", function(){
+			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.OVERWRITE);
 		});	
 
 		it("has a default type of Object", function(){
@@ -24,51 +21,51 @@ describe("Buffer", function(){
 		});
 
 		it("allows an initial capacity to be set", function() {
-			buffer = new Buffer({capacity: 24});
-			expect(buffer.capacity).to.be(24);
+			var mbuffer = new Buffer({capacity: 24});
+			expect(mbuffer.capacity).to.be(24);
 		});
 
 		it("allows an initial data type to be set", function() {
 			buffer = new Buffer({DATA_TYPE: Function});
 			expect(buffer.DATA_TYPE).to.be(Function);
 		});
+
+		it("allows an initial grow mode to be set", function() {
+			buffer = new Buffer({GROW_MODE: Buffer.GROW_MODE.REGROW});
+			expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.REGROW);
+		});
 	});
 
-	describe("#setType", function() {
-		beforeEach(function() {
-			var buffer = new Buffer();	
-		});
+	describe("#setDataType", function() {
+		var buffer = new Buffer();		
+
 		it("sets the DATA_TYPE if the structure is empty", function() {
 			expect(buffer.DATA_TYPE).to.not.be(String);
-			buffer.setType(String);
+			buffer.setDataType(String);
 			expect(buffer.DATA_TYPE).to.be(String);
 		});
 
 		it("throws an exception if the structure is not empty", function() {
 			buffer.add(9);
-			try {
-				buffer.setDataType(String);
-				expect("this should not run").to.be("");
-			} catch (e) {
-				expect(e).to.be.a(Buffer.InvalidTypeChangeException);
-			}
+			expect((function(){
+				buffer.setDataType(Number);
+			})).to.throwException(/It is not safe to change a buffer's type/);
 		});
 	});
 
 	describe("#setGrowMode", function() {
 		it("should apply the new grow strategy to the buffer", function() {
+			var buffer = new Buffer();
 			buffer.setGrowMode(Buffer.GROW_MODE.OVERWRITE);
 			expect(buffer.GROW_MODE).to.eql(Buffer.GROW_MODE.OVERWRITE);
 		});
 	});
 
 	describe("#isEmpty", function() {
+		var buffer = new Buffer();		
 
-		beforeEach(function(){
-			var buffer = new Buffer();
-		});
-
-		it("returns true if the buffer is empty", function(){
+		it("returns true if the buffer is has no elements", function(){
+			buffer.clear();
 			expect(buffer.isEmpty()).to.eql(true);
 		});
 
@@ -79,9 +76,7 @@ describe("Buffer", function(){
 	});
 
 	describe("#length attributes", function(){
-		beforeEach(function(){
-			var buffer = new Buffer();
-		});
+		var buffer = new Buffer();		
 
 		it("returns the nuber of elements in the buffer", function(){
 			buffer.add("element");
@@ -90,21 +85,21 @@ describe("Buffer", function(){
 	});
 
 	describe("#add", function() {
-		beforeEach(function(){
-			var buffer = new Buffer();
-		});
-
+		var buffer = new Buffer();		
+		
 		it("increases the length of the buffer by one", function(){
 			expect(buffer).to.be.empty();
 			buffer.add("element");
-			buffer(buffer.length).to.eql(1);
+			expect(buffer.length).to.eql(1);
 		});
 
 		it("allows only elements of the defined DATA_TYPE", function(){
 			expect((function(){
 				buffer.setDataType(Number);
 				buffer.add("not a number");
-			})).to.throwException(/InvalidElementTypeException/);
+			})).to.throwException(function(e){
+				expect(e).to.be.a(Buffer.InvalidTypeChangeException);
+			});
 		});
 	});
 });
