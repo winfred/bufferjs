@@ -64,7 +64,7 @@ window.Buffer = (function(){
      *
      * @param {Object} element
      * @return {boolean} true if the element responds to .equals()
-     * @api public
+     * @api private
      */
     function shouldUseEqualsMethodFor(element){
       return typeof element.equals === 'function';
@@ -95,6 +95,8 @@ window.Buffer = (function(){
 
     /**
      * Make room for another element(s) using the grow strategy
+     * 
+     * @api private
      */
     function makeSpace() {
       if (GROW_MODE === Buffer.GROW_MODE.CONTINUOUS)
@@ -108,6 +110,8 @@ window.Buffer = (function(){
      *  Rearrangement should only happen if the buffer
      *  changes grow modes mid-lifecycle, which seems unlikely.
      *  TODO: use array slicing to rearrange head/tail mismatch in this case
+     *
+     *  @api private
      */
     function regrow() {
       buffer.capacity = capacity = capacity * 2;
@@ -125,6 +129,8 @@ window.Buffer = (function(){
 
     /**
      * Moves head one position forward
+     *
+     * @api private
      */
     function incrementHead() {
       if(head + 1 === capacity) head = 0;
@@ -133,6 +139,8 @@ window.Buffer = (function(){
   
     /**
      * Moves tail one position forward
+     *
+     * @api private
      */
     function incrementTail() {
       if(tail + 1 == capacity) tail = 0;
@@ -146,6 +154,7 @@ window.Buffer = (function(){
      *
      * @param {Object} element
      * @return {boolean} true if the element does not match the buffer's data type
+     * @api private
      */
     function typeDoesNotMatch(element){
       if (typeof element === "number")
