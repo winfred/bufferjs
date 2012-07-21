@@ -25,12 +25,14 @@ BufferJS tries to follow as many buffer and javascript conventions as possible, 
 * GROW_MODE - an initial growth mode (defaults to Buffer.GROW_MODE.OVERWRITE)
 * DATA_TYPE - optional data type to enforce (defaults to null for no enforcement)
 
+```javascript
     var options = {
       capacity: 42,
       GROW_MODE: Buffer.GROW_MODE.CONTINUOUS,
       DATA_TYPE: MyObject
     };
     var buffer = new Buffer(options);
+```
 
 ### Attributes
 
@@ -39,33 +41,41 @@ BufferJS tries to follow as many buffer and javascript conventions as possible, 
 ### Methods
 
 * write - add an element to the buffer
-    
+
+```javascript
     buffer.write({some: 'JSON', or: 'anything really'})
     buffer.write(function(){console.log('i need this to be called later')})
     buffer.write(42)
     buffer.write(myObject);
-
+```
 * read - dequeue the oldest element in the buffer
 
+```javascript
     var element = buffer.read();
     $.post('/game/actions', element);
+```
 
 * contains - simple O(n) search for containment
-  
+
+ ```javascript
     buffer.write("hey")
     buffer.contains("hey") //returns true
     buffer.contains(1234) //returns false
+```
 
 * setDataType - apply a specific JS Object type to enforce across the buffer, only to be called on empty buffers
 
+```javascript
     buffer.setDataType(Number) //enforces both primitive and OO numbers
     buffer.setDataType(String) //enforces both primitive and OO strings
     buffer.setDataType(MyObject) //works with custom objects as well
     buffer.setDataType(Function) //or functions, etc...
+```
 
 * setGrowMode - apply one of the two grow modes to the buffer
 
+```javascript
     buffer.setGrowMode(Buffer.GROW_MODE.CONTINUOUS) //don't limit the buffer's size
     buffer.setGrowMode(Buffer.GROW_MODE.OVERWRITE) //buffer's capacity is fixed, oldest will be overwritten
-
+```
 
