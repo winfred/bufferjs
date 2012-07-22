@@ -22,9 +22,9 @@ window.Buffer = (function(){
      */
     options = options || {};
     this.name = "Buffer";
-    GROW_MODE = this.GROW_MODE = options.GROW_MODE || Buffer.DEFAULT.GROW_MODE;
-    DATA_TYPE = this.DATA_TYPE = options.DATA_TYPE || Buffer.DEFAULT.DATA_TYPE;
-    capacity = this.capacity = options.capacity || Buffer.DEFAULT.capacity;
+    GROW_MODE = this.GROW_MODE = options.GROW_MODE || Buffer.DEFAULT.GROW_MODE || Buffer.GROW_MODE.OVERWRITE;
+    DATA_TYPE = this.DATA_TYPE = options.DATA_TYPE || Buffer.DEFAULT.DATA_TYPE || null;
+    capacity = this.capacity = options.capacity || Buffer.DEFAULT.capacity || 20;
     array = new Array(this.capacity);
     head = 0;
     tail = -1;

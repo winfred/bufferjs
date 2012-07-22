@@ -256,4 +256,12 @@ describe("Buffer.DEFAULT", function() {
     var buffer = new Buffer();
     expect(buffer.capacity).to.be(50);
   });
+
+  it("is Jimmy proof in case the POJO is overwritten", function() {
+    Buffer.DEFAULT = "HERP DERP";
+    var buffer = new Buffer();
+    expect(buffer.capacity).to.be(20);
+    expect(buffer.DATA_TYPE).to.be(null);
+    expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.OVERWRITE);
+  });
 });
