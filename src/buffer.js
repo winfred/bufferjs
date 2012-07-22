@@ -23,7 +23,7 @@ window.Buffer = (function(){
     options = options || {};
     this.name = "Buffer";
     GROW_MODE = this.GROW_MODE = options.GROW_MODE || Buffer.GROW_MODE.OVERWRITE;
-    DATA_TYPE = this.DATA_TYPE = options.DATA_TYPE;
+    DATA_TYPE = this.DATA_TYPE = options.DATA_TYPE || null;
     capacity = this.capacity = options.capacity || 20;
     array = new Array(this.capacity);
     head = 0;
