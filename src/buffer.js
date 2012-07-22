@@ -7,7 +7,7 @@ window.Buffer = (function(){
    *        When capacity is reached, the oldest element gets replaced
    *        This is good for streaming data.
    *
-   *    2.) CONTINUOUS - will simply keep writeing elements to the array
+   *    2.) CONTINUOUS - will simply keep writing elements to the array
    *        much like a regular JS array.push()
    *
    *  TODO: put examples here
@@ -190,8 +190,8 @@ window.Buffer = (function(){
     /**
      * Apply a new grow mode to the buffer
      *
-     * @return {Buffer} this buffer, handy for chaining
      * @param {Buffer.GROW_MODE}
+     * @return {Buffer} this buffer, handy for chaining
      * @api public
      */
     this.setGrowMode = function(growMode){
@@ -330,7 +330,7 @@ window.Buffer = (function(){
   })();
 
   /**
-   * Exception: Thrown if writeing an element of incompatible type
+   * Exception: Thrown if writing an element of incompatible type
    */
   Buffer.InvalidTypeWriteException = (function(){
     var error = function(){
