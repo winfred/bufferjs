@@ -237,3 +237,23 @@ describe("Buffer", function(){
   });
 
 });
+
+describe("Buffer.DEFAULT", function() {
+  it("allows a default application-wide GROW_MODE to be set", function() {
+    Buffer.DEFAULT.GROW_MODE = Buffer.GROW_MODE.CONTINUOUS;
+    var buffer = new Buffer();
+    expect(buffer.GROW_MODE).to.be(Buffer.GROW_MODE.CONTINUOUS);
+  });
+
+  it("allows a default application-wide DATA_TYPE to be set", function() {
+    Buffer.DEFAULT.DATA_TYPE = String;
+    var buffer = new Buffer();
+    expect(buffer.DATA_TYPE).to.be(String);
+  });
+
+  it("allows a default application-wide capacity to be set", function() {
+    Buffer.DEFAULT.capacity = 50;
+    var buffer = new Buffer();
+    expect(buffer.capacity).to.be(50);
+  });
+});
