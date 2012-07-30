@@ -13,7 +13,7 @@ window.Buffer = (function(){
    *  TODO: put examples here
    */
   var Buffer = function(options){
-    var buffer, GROW_MODE, DATA_TYPE, capacity, array, length, head, tail;
+    var buffer, GROW_MODE, DATA_TYPE, capacity, array, length;
 
     /**
      * ------------------------------
@@ -25,11 +25,8 @@ window.Buffer = (function(){
     GROW_MODE = this.GROW_MODE = options.GROW_MODE || Buffer.DEFAULT.GROW_MODE || Buffer.GROW_MODE.OVERWRITE;
     DATA_TYPE = this.DATA_TYPE = options.DATA_TYPE || Buffer.DEFAULT.DATA_TYPE || null;
     capacity = this.capacity = options.capacity || Buffer.DEFAULT.capacity || 20;
-    array = new Array(this.capacity);
-    head = 0;
-    tail = -1;
-    length = this.length = 0;
-
+		array = [];
+		this.length = 0;
     //brining this into scope for private methods
     buffer = this;
 
@@ -40,111 +37,12 @@ window.Buffer = (function(){
      */
 
     /**
-     *  Adds 1 to the length.
-     *    Also updates the public length accessor.
-     *
-     *  @api private
-     */
-    function incrementLength(){
-      buffer.length = ++length;
-    };
-
-    /**
-     * Subtract 1 from the length.
-     *   Also updates the public length accessor.
+     * Updates the public length accessor.
      *
      * @api private
      */
-    function decrementLength(){
-      buffer.length = --length;
-    };
-
-    /**
-     * Determine if a .equals() method should be used on an element
-     *
-     * @param {Object} element
-     * @return {boolean} true if the element responds to .equals()
-     * @api private
-     */
-    function shouldUseEqualsMethodFor(element){
-      return typeof element.equals === 'function';
-    };
-
-    /**
-     * Iterate the array with a function
-     *
-     * @param {Function} 
-     */
-    function iterateWith(fn){
-      var breaking = false, 
-          i = head - 1;
-
-      function breakIteration(){
-        breaking = true;
-      };
-
-      while(i != tail) {
-        if(i + 1 >= length)
-          i = 0;
-        if(breaking)
-          break;
-        else
-          fn(array[++i], breakIteration);
-      } 
-    };
-
-    /**
-     * Make room for another element(s) using the grow strategy
-     * 
-     * @api private
-     */
-    function makeSpace() {
-      if (GROW_MODE === Buffer.GROW_MODE.CONTINUOUS)
-        regrow();
-      else
-        incrementHead();
-    };
-
-    /**
-     * Double the array's capacity and rearrange the head/tail if needed
-     *  Rearrangement should only happen if the buffer
-     *  changes grow modes mid-lifecycle, which seems unlikely.
-     *  TODO: use array slicing to rearrange head/tail mismatch in this case
-     *
-     *  @api private
-     */
-    function regrow() {
-      buffer.capacity = capacity = capacity * 2;
-      if (head > tail) {
-        var newArray = new Array(capacity),
-            index = 0;        
-        iterateWith(function(probe){
-          newArray[index] = probe;
-        });
-        array = newArray;
-        head = 0;
-        tail = length - 1;
-      }
-    };
-
-    /**
-     * Moves head one position forward
-     *
-     * @api private
-     */
-    function incrementHead() {
-      if(head + 1 === capacity) head = 0;
-      else head++;
-    };
-  
-    /**
-     * Moves tail one position forward
-     *
-     * @api private
-     */
-    function incrementTail() {
-      if(tail + 1 == capacity) tail = 0;
-      else tail++;
+    function updateLength(){
+      buffer.length = array.length;
     };
 
     /**
@@ -165,10 +63,73 @@ window.Buffer = (function(){
     };
 
     /**
+     * Determine if a .equals() method should be used on an element
+     *
+     * @param {Object} element
+     * @return {boolean} true if the element responds to .equals()
+     * @api private
+     */
+    function shouldUseEqualsMethodFor(element){
+      return typeof element.equals === 'function';
+    };
+
+    /**
      * ---------------------------
      * | Public Instance Methods |
      * ---------------------------
      */
+
+    
+    /**
+     * Iterate the array with a function
+     *
+     * @param {Function} 
+     * @return this
+     * @api public
+     */
+    this.forEach = function(fn){
+      var breaking = false;
+
+      function breakIteration(){
+        breaking = true;
+      };
+
+      for (var i = 0, len = array.length; i < len; ++i) {
+        if(breaking) break;
+        else fn(array[++i], i, breakIteration);
+      }
+      return this;
+    };
+
+    /**
+     * Check if the buffer contains an equivalent element
+     *  Will use a .equal() method if available
+     *  Otherwise checks with ===
+     * 
+     * @param {this.DATA_TYPE} element
+     * @return {boolean} true if an equal element was found
+     * @api public
+     */
+    this.contains = function(element){
+      var found = false,
+          useEqualsMethod = shouldUseEqualsMethodFor(element);
+
+      this.forEach(function(probe,index,breakIteration) {
+        if (useEqualsMethod) {
+
+          if (element.equals(probe))
+            found = true; breakIteration();
+        
+        } else {
+
+          if (element === probe)
+            found = true; breakIteration();
+        }
+      });
+
+      return found;
+    };  
+
 
     /**
      * Apply a new data type restriction to an empty buffer
@@ -206,7 +167,7 @@ window.Buffer = (function(){
      * @api public
      */
     this.isEmpty = function(){
-      return length == 0;
+      return array.length == 0;
     };
 
     /**
@@ -216,41 +177,10 @@ window.Buffer = (function(){
      * @api public
      */
     this.clear = function(){
-      array = new Array(capacity);
-      this.length = length = 0;
-      head = 0;
-      tail = -1;
+      array = []
+			this.length = 0;
       return this;      
     };
-
-    /**
-     * Check if the buffer contains an equivalent element
-     *  Will use a .equal() method if available
-     *  Otherwise checks with ===
-     * 
-     * @param {this.DATA_TYPE} element
-     * @return {boolean} true if an equal element was found
-     * @api public
-     */
-    this.contains = function(element){
-      var found = false,
-          useEqualsMethod = shouldUseEqualsMethodFor(element);
-
-      iterateWith(function(probe,breakIteration) {
-        if (useEqualsMethod) {
-
-          if (element.equals(probe))
-            found = true; breakIteration();
-        
-        } else {
-
-          if (element === probe)
-            found = true; breakIteration();
-        }
-      });
-
-      return found;
-    };  
 
     /**
      * write a new element to the buffer (Enqueue)
@@ -263,15 +193,13 @@ window.Buffer = (function(){
       if (DATA_TYPE && typeDoesNotMatch(element))
         throw new Buffer.InvalidTypeWriteException();
 
-      if (length === capacity) {
-        makeSpace();
-        if (GROW_MODE === Buffer.GROW_MODE.CONTINUOUS)
-          incrementLength();
+			array.push(element);
+
+      if (array.length > capacity && GROW_MODE !== Buffer.GROW_MODE.CONTINUOUS) {
+				array.shift();
       } else {
-        incrementLength();
-      }
-      incrementTail();
-      array[tail] = element;
+	      updateLength();			
+			}
       return this;      
     }
     
@@ -282,24 +210,11 @@ window.Buffer = (function(){
      * @api public
      */
     this.read = function() {
-      if (this.isEmpty())
-        return null;
-      else {
-        var element = array[head];
-        array[head] = null;
-        incrementHead();
-        decrementLength();
-        return element;
-      }
-      
-    }
+      if (!this.isEmpty())
+				this.length--;
 
-    this.toString = function(){
-      var string = "Buffer: [";
-      for (var i = 0, limit = length; i < limit ; i++)
-        string += ", " + array[i];
-      return string += "]";
-    };
+			return array.shift();
+    }
   };
 
   /**

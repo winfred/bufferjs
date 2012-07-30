@@ -101,26 +101,13 @@ describe("Buffer", function(){
     });
   });
 
-  describe("#contains", function(){
-    var buffer = new Buffer();
-
-    it("returns true if the buffer contains a certain element",function(){
-      buffer.write("a");
-      expect(buffer.contains("a")).to.eql(true);
-    });
-
-    it("returns false if the buffer does not contain an element", function(){
-      expect(buffer.contains(12345)).to.eql(false);
-    });
-  });
-
   describe("#write", function() {
     var buffer = new Buffer();    
     
     it("increases the length of the buffer by one", function(){
       expect(buffer).to.be.empty();
       buffer.write("element");
-      expect(buffer.length).to.eql(1);
+      expect(buffer.length).to.be(1);
     });
 
     it("allows elements of the defined DATA_TYPE", function(){
@@ -152,16 +139,16 @@ describe("Buffer", function(){
     it("decreases the length by one", function(){
       var length = buffer.length;
       buffer.read();
-      expect(buffer.length).to.eql(length - 1);
+      expect(buffer.length).to.be(length - 1);
     });
     
     it("returns the oldest element in the buffer", function(){
-      expect(buffer.read()).to.eql("b");
+      expect(buffer.read()).to.be("b");
     });
 
-    it("returns null for an empty buffer",function(){
+    it("returns undefined for an empty buffer",function(){
       buffer.clear();
-      expect(buffer.read()).to.eql(null);
+      expect(buffer.read()).to.be(undefined);
     });
 
     it("removes the oldest element from the buffer", function(){
@@ -177,9 +164,8 @@ describe("Buffer", function(){
   describe("GROW_MODE::CONTINUOUS", function(){
     var buffer = new Buffer({capacity: 5, GROW_MODE: Buffer.GROW_MODE.CONTINUOUS});
 
-    it("capacity doubles once capacity is reached", function(){
-      writeTo(buffer,100);
-      expect(buffer.capacity).to.be(160); //5, 10, 20, 40, 80, 160
+    it("capacity is completely ignored in this mode", function(){
+      expect(buffer.capacity).to.be(5);
     });
 
     it("length grows steadily based on writes", function(){
@@ -195,19 +181,6 @@ describe("Buffer", function(){
       expect(buffer.length).to.be(100);
     });
 
-    it("capacity doubles only when space is needed (a la circular array)", function(){
-      expect(buffer.capacity).to.be(160);
-    });
-
-    it("when capacity doubles, circular array structure is still transparent", function(){
-      buffer.clear();
-      writeTo(buffer, 160);
-      expect(buffer.capacity).to.be(160);
-      expect(buffer.read()).to.be(0);
-      readFrom(buffer,10); //remove first 10
-      writeTo(buffer, 11); //add eleven more to cause capacity to double
-      expect(buffer.read()).to.be(11); //the oldest element is still 11
-    });
   });
   
   describe("GROW_MODE::OVERWRITE", function(){
